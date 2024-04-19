@@ -5,7 +5,7 @@ function [samples, labels] = generate_training_data(main_folder_name)
 % and returns those features + class labels.
 main_folder = dir(main_folder_name);
 write_normalized_images_to_file = false;
-num_of_features = 3;
+num_of_features = 5;
 num_of_samples = 1000;
 
 % Set up features and classifications arrays, preallocate 1000 entries
@@ -25,23 +25,25 @@ for i=3 : length(main_folder)
    for j=3 : length(gem_images)
        file_name = strcat(subfolder_name, "/", gem_images(j).name);
        path_to_folder = strcat("training_data", "/", main_folder(i).name);
-       if ~exist(path_to_folder, 'dir')
-            mkdir(path_to_folder);
-       end
 
-       % If the normalized training image has been saved previously, reuse
+       % Get the path where the gem/mask would be stored if saved before
        path_to_gem = strcat(path_to_folder, "/", num2str(sample_count), ".png");
        path_to_mask = strcat(path_to_folder, "/", num2str(sample_count), "_mask", ".png");
 
-       if exist(path_to_gem, 'dir')
-           % Preprocess the image to segment the gem out and normalize
-           [normalized_img, gem_mask] = preprocess_image(file_name);
-       else
+       % If the training image has been saved before, reuse it
+       % Otherwise, process it from scratch.
+       if exist(path_to_gem, 'file')
            normalized_img = im2double(imread(path_to_gem));
            gem_mask = imread(path_to_mask);
+       else
+           [normalized_img, gem_mask] = preprocess_image(file_name);
        end
 
-       % If this flag is true write the image/mask to file
+       % If the flag is true write the image/mask to file for debugging
+       if write_normalized_images_to_file && ~exist(path_to_folder, 'dir')
+            mkdir(path_to_folder);
+       end
+
        if write_normalized_images_to_file
          imwrite(normalized_img, path_to_gem);
          imwrite(gem_mask, path_to_mask);
