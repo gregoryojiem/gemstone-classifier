@@ -18,13 +18,14 @@ sample_count = 1;
 % Loop over each subfolder for each type of gem
 % Start at i=3 to avoid looping over current/parent directories
 for i=3 : length(main_folder)
-   subfolder_name = strcat(main_folder_name, "/", main_folder(i).name);
+   subfolder = main_folder(i).name;
+   subfolder_path = strcat(main_folder_name, "/", subfolder);
    gem_images = dir(subfolder_name);
     
    % Loop over the training images and generate normalized training images
    for j=3 : length(gem_images)
-       file_name = strcat(subfolder_name, "/", gem_images(j).name);
-       path_to_folder = strcat("training_data", "/", main_folder(i).name);
+       gem_image_path = strcat(subfolder_path, "/", gem_images(j).name);
+       path_to_folder = strcat("training_data", "/", subfolder);
 
        % Get the path where the gem/mask would be stored if saved before
        path_to_gem = strcat(path_to_folder, "/", num2str(sample_count), ".png");
@@ -36,7 +37,7 @@ for i=3 : length(main_folder)
            normalized_img = im2double(imread(path_to_gem));
            gem_mask = imread(path_to_mask);
        else
-           [normalized_img, gem_mask] = preprocess_image(file_name);
+           [normalized_img, gem_mask] = preprocess_image(gem_image_path);
        end
 
        % If the flag is true write the image/mask to file for debugging
@@ -51,7 +52,7 @@ for i=3 : length(main_folder)
 
        % Generate and save features for the normalized image
        samples(sample_count, :) = generate_features(normalized_img, gem_mask);
-       labels{sample_count} = main_folder(i).name;
+       labels{sample_count} = subfolder;
        sample_count = sample_count + 1;
    end
 end
