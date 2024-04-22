@@ -21,7 +21,13 @@ disp('Generating training data');
 % Train a classifier and save it to a file
 disp('Training classifier');
 if classifier_type == "dt"
-    dt = fitctree(training_data, labels);
+    dt = fitctree(training_data, labels,'OptimizeHyperparameters','all');
+    view(dt,'Mode','graph');
+    resub_loss = resubLoss(dt);
+    cv_tree = crossval(dt);
+    cv_loss = kfoldLoss(cv_tree);
+    disp(['Cross validation loss:', num2str(cv_loss)]);
+    disp(['Resubstitution loss:', num2str(resub_loss)]);
     disp('Saving classifier to file');
     save(output_filename, 'dt');
 else
