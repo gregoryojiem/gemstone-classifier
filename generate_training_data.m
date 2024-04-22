@@ -5,7 +5,7 @@ function [samples, labels] = generate_training_data(main_folder_name)
 % and returns those features + class labels.
 main_folder = dir(main_folder_name);
 write_normalized_images_to_file = false;
-num_of_features = 5;
+num_of_features = 14;
 num_of_samples = 1000;
 
 % Set up features and classifications arrays, preallocate 1000 entries
@@ -20,7 +20,7 @@ sample_count = 1;
 for i=3 : length(main_folder)
    subfolder = main_folder(i).name;
    subfolder_path = strcat(main_folder_name, "/", subfolder);
-   gem_images = dir(subfolder_name);
+   gem_images = dir(subfolder_path);
     
    % Loop over the training images and generate normalized training images
    for j=3 : length(gem_images)
