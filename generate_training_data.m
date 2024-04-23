@@ -25,11 +25,12 @@ for i=3 : length(main_folder)
    % Loop over the training images and generate normalized training images
    for j=3 : length(gem_images)
        gem_image_path = strcat(subfolder_path, "/", gem_images(j).name);
-       path_to_folder = strcat("training_data", "/", subfolder);
+       path_to_gem_folder = strcat("training_data", "/", subfolder);
+       path_to_mask_folder = strcat("training_data_masks", "/", subfolder);
 
        % Get the path where the gem/mask would be stored if saved before
-       path_to_gem = strcat(path_to_folder, "/", num2str(sample_count), ".png");
-       path_to_mask = strcat(path_to_folder, "/", num2str(sample_count), "_mask", ".png");
+       path_to_gem = strcat(path_to_gem_folder, "/", num2str(sample_count), ".png");
+       path_to_mask = strcat(path_to_mask_folder, "/", num2str(sample_count), "_mask", ".png");
 
        % If the training image has been saved before, reuse it
        % Otherwise, process it from scratch.
@@ -40,11 +41,15 @@ for i=3 : length(main_folder)
            [normalized_img, gem_mask] = preprocess_image(gem_image_path);
        end
 
-       % If the flag is true write the image/mask to file for debugging
-       if write_normalized_images_to_file && ~exist(path_to_folder, 'dir')
-            mkdir(path_to_folder);
+       % If a folder with training data doesn't exist, create one
+       if ~exist(path_to_gem_folder, 'dir') || ~exist(path_to_mask_folder, 'dir')
+            mkdir(path_to_gem_folder);
+            mkdir(path_to_mask_folder);
+            write_normalized_images_to_file = true;
        end
 
+       % If this flag is true we save the normalized image to a file
+       % Used for debugging/making resnet50 input
        if write_normalized_images_to_file
          imwrite(normalized_img, path_to_gem);
          imwrite(gem_mask, path_to_mask);
