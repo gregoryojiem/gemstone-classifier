@@ -1,11 +1,10 @@
-function [gem_img, gem_mask] = preprocess_image(file_name)
-%PREPROCESS_IMAGE Takes in a file name, segments out a gem from the image
+function gem_img = preprocess_image(input_img)
+%PREPROCESS_IMAGE Takes in an image, returns a segmented gem image
 % Given that gems are radically different in shape, color, size, 
 % reflectivity, etc. this approach segments by performing edge detection,
 % isolating gem edges, and taking the convex hull of those edges.
 
-% Read in the image and perform the basic preprocessing needed to normalize
-input_img = imread(file_name);
+% Perform the basic preprocessing needed to normalize the image
 gray_img = im2double(rgb2gray(input_img)); 
 equalized_img = adapthisteq(gray_img);
 blurred_img = imfilter(equalized_img, fspecial('average', 8));
@@ -80,8 +79,7 @@ cropped_input_img = imcrop(padded_input_img, normalize_crop);
 % The final step is to remove the background using the mask
 segmented_gem = cropped_input_img .* uint8(cropped_gem_mask);
 
-% Resize to 224x224 for our classifiers and return the image/mask
+% Resize to 224x224 for our classifiers and return the image
 gem_img = imresize(segmented_gem, 1/3, 'nearest');
-gem_mask = imresize(cropped_gem_mask, 1/3, 'nearest');
 end
 

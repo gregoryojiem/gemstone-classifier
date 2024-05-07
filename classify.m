@@ -6,20 +6,21 @@ if ~exist(filename, "file")
 end
 
 % Perform pre-processing on the image
-[gem_img, gem_mask] = preprocess_image(filename);
+gem_img = preprocess_image(imread(filename));
 
 % Load in a classifier; this can be a neural network or a decision tree
-load classifier.mat;
+% decision_tree.mat and resnet.mat are defined and can be used here
+load decision_tree.mat;
 
 % Check what type the classifier is, and predict the image class
 if exist('net', 'var') 
     scores = predict(net, single(gem_img));
     [label,score] = scores2label(scores,class_labels);
-    label = string(label);
+    label = strtrim(string(label));
 elseif exist('dt', 'var') 
-    feature_vector = generate_features(gem_img, gem_mask);
-    predicted_class = predict(decision_tree, feature_vector);
-    label = predicted_class{1};
+    feature_vector = generate_features(gem_img);
+    predicted_class = predict(dt, feature_vector);
+    label = strtrim(string(predicted_class));
 end 
 
 % Set the classification equal to the predicted class label and display it
